@@ -12,7 +12,7 @@
 				<router-link to="/messages">Сообщения</router-link>
 			</li>
 			<li>
-				<router-link to="/auth">Выход</router-link>
+				<a href="#" @click.prevent="logout">Выход</a>
 			</li>
 		</ul>
 	</nav>
@@ -20,7 +20,12 @@
 
 <script>
 export default {
-
+	methods: {
+		logout() {
+			this.$store.commit('AuthModule/logout')
+			this.$router.push('/auth')
+		}
+	}
 }
 </script>
 

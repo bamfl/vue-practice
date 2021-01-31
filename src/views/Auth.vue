@@ -20,22 +20,23 @@
 </template>
 
 <script>
-import { Form, Field, ErrorMessage, useSubmitCount } from 'vee-validate'
+import { Form, Field, ErrorMessage } from 'vee-validate'
 import { configure } from 'vee-validate'
 import * as yup from 'yup'
+import {customError} from '../utils/customError'
 
 export default {
 	data() {
 		const schema = yup.object({
       email: yup.string().trim().required('Обязательное поле').email('Неверный email'),
-      password: yup.string().required('Обязательное поле').min(5, `Минимум 5 символов, а у вас `),
+      password: yup.string().required('Обязательное поле').min(6, `Минимум 6 символов, а у вас `),
 		})	
 		
 		configure({
-			validateOnBlur: true, // controls if `blur` events should trigger validation with `handleChange` handler
-			validateOnChange: true, // controls if `change` events should trigger validation with `handleChange` handler
-			validateOnInput: true, // controls if `input` events should trigger validation with `handleChange` handler
-			validateOnModelUpdate: true, // controls if `update:modelValue` events should trigger validation with `handleChange` handler
+			validateOnBlur: true,
+			validateOnChange: true,
+			validateOnInput: true,
+			validateOnModelUpdate: true
 		})
 
 		return {
@@ -43,9 +44,20 @@ export default {
 			password: ''
 		}
 	},
+	mounted() {
+		if (this.$route.query.message) {
+			this.$store.dispatch('setMessage', {
+				value: customError(this.$route.query.message),
+				type: 'warning'
+			})
+		}
+	},
 	methods: {
-		submit(val) {
-			console.log(val)
+		async submit(val) {
+			try {
+				await this.$store.dispatch('AuthModule/login', val)
+				this.$router.push('/')				
+			} catch (error) {}
 		}
 	},
 	computed: {
